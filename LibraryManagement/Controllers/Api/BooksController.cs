@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Data;
 using LibraryManagement.Models;
 using LibraryManagement.Repositories;
+using LibraryManagement.Interfaces;
 
 namespace LibraryManagement.Controllers.Api
 {
@@ -15,11 +16,12 @@ namespace LibraryManagement.Controllers.Api
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly BookRepository _bookRepository;
-
-        public BooksController(BookRepository bookRepository)
+        private readonly IBookRepository _bookRepository;
+        private readonly IAuthorRepository _authorRepository;
+        public BooksController(IBookRepository bookRepository, IAuthorRepository authorRepository)
         {
             _bookRepository = bookRepository;
+            _authorRepository = authorRepository;
         }
 
         // GET: api/Books
@@ -79,6 +81,14 @@ namespace LibraryManagement.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
+            if (book == null)
+                return BadRequest();
+
+            book.Author = await _authorRepository.GetAuthorAsync(book.AuthorId);
+
+            if (book.Author == null)
+                return BadRequest();
+
             await _bookRepository.AddBookAsync(book);
 
             return CreatedAtAction("GetBook", new { id = book.BookId }, book);

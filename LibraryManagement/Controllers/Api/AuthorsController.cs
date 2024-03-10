@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Data;
 using LibraryManagement.Models;
 using LibraryManagement.Repositories;
+using LibraryManagement.Interfaces;
 
 namespace LibraryManagement.Controllers.Api
 {
@@ -15,9 +16,9 @@ namespace LibraryManagement.Controllers.Api
     [ApiController]
     public class AuthorsController : ControllerBase
     {
-        private readonly AuthorRepository _authorRepository;
+        private readonly IAuthorRepository _authorRepository;
 
-        public AuthorsController(AuthorRepository authorRepository)
+        public AuthorsController(IAuthorRepository authorRepository)
         {
             _authorRepository = authorRepository;
         }
@@ -77,7 +78,7 @@ namespace LibraryManagement.Controllers.Api
 
         // POST: api/Authors
         [HttpPost]
-        public async Task<ActionResult<Author>> PostAuthor(Author author)
+        public async Task<ActionResult<Author>> PostAuthor([FromBody] Author author)
         {
             await _authorRepository.AddAuthorAsync(author);
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Data;
 using LibraryManagement.Models;
+using LibraryManagement.Repositories;
 
 namespace LibraryManagement.Controllers.Api
 {
@@ -14,32 +15,33 @@ namespace LibraryManagement.Controllers.Api
     [ApiController]
     public class AuthorsController : ControllerBase
     {
-        private readonly LibManagerDbContext _libManagerDbcontext;
+        private readonly AuthorRepository _authorRepository;
 
-        public AuthorsController(LibManagerDbContext context)
+        public AuthorsController(AuthorRepository authorRepository)
         {
-            _libManagerDbcontext = context;
+            _authorRepository = authorRepository;
         }
 
         // GET: api/Authors
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
         {
-            return await _libManagerDbcontext.Authors.OrderBy(a => a.Name).ToListAsync();
+            var authors = await _authorRepository.GetAuthorsAsync();
+            return Ok(authors);
         }
 
         // GET: api/Authors/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Author>> GetAuthor(int id)
         {
-            var author = await _libManagerDbcontext.Authors.FirstOrDefaultAsync(a =>a.AuthorId==id);
+            var author = await _authorRepository.GetAuthorAsync(id);
 
             if (author == null)
             {
                 return NotFound();
             }
 
-            return author;
+            return Ok(author);
         }
 
         // PUT: api/Authors/5
@@ -50,16 +52,15 @@ namespace LibraryManagement.Controllers.Api
             {
                 return BadRequest();
             }
-
-            _libManagerDbcontext.Entry(author).State = EntityState.Modified;
+            _authorRepository.ChangeEntityState(author);
 
             try
             {
-                await _libManagerDbcontext.SaveChangesAsync();
+                await _authorRepository.SaveAuthorAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                var result = _libManagerDbcontext.Authors.Any(a => a.AuthorId == id);
+                var result = await _authorRepository.AuthorExistsAsync(id);
 
                 if (!result)
                 {
@@ -78,8 +79,7 @@ namespace LibraryManagement.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<Author>> PostAuthor(Author author)
         {
-            _libManagerDbcontext.Authors.Add(author);
-            await _libManagerDbcontext.SaveChangesAsync();
+            await _authorRepository.AddAuthorAsync(author);
 
             return CreatedAtAction("GetAuthor", new { id = author.AuthorId }, author);
         }
@@ -88,15 +88,14 @@ namespace LibraryManagement.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
-            var author = await _libManagerDbcontext.Authors.FirstOrDefaultAsync(a => a.AuthorId == id);
-            
+            var author = await _authorRepository.GetAuthorAsync(id);
+
             if (author == null)
             {
                 return NotFound();
             }
 
-            _libManagerDbcontext.Authors.Remove(author);
-            await _libManagerDbcontext.SaveChangesAsync();
+            await _authorRepository.RemoveAuthorAsync(author);
 
             return NoContent();
         }

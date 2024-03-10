@@ -1,5 +1,6 @@
 ﻿using LibraryManagement.Data;
 using LibraryManagement.Models;
+using LibraryManagement.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,29 +11,30 @@ namespace LibraryManagement.Controllers.Api
     [ApiController]
     public class SearchController : ControllerBase
     {
-        private readonly LibManagerDbContext _libManagerDbcontext;
-        public SearchController(LibManagerDbContext context) 
+        private readonly BookRepository _bookRepository;
+        public SearchController(BookRepository bookRepository) 
         {
-            _libManagerDbcontext = context;
+            _bookRepository = bookRepository;
         }
 
         [HttpPost]
         public async Task<IActionResult> SearchBook([FromBody] string ISBN, string? Title)
         {
-            Book book = new Book();
+            Book? book = new Book();
 
             if (!string.IsNullOrEmpty(ISBN) && string.IsNullOrEmpty(Title))
             {
-                book = await _libManagerDbcontext.Books.FirstOrDefaultAsync(bk => bk.ISBN == ISBN);
+                book = await _bookRepository.GetBookByISBNAsync(ISBN);
             }
             if(string.IsNullOrEmpty(ISBN) && !string.IsNullOrEmpty(Title))
             {
-                book = await _libManagerDbcontext.Books.FirstOrDefaultAsync(bk => bk.Title == Title);
+                book = await _bookRepository.GetBookByTitleAsync(Title);
             }
 
             if (!string.IsNullOrEmpty(ISBN) && !string.IsNullOrEmpty(Title))
             {
-                book = await _libManagerDbcontext.Books.FirstOrDefaultAsync(bk => bk.Title == Title && bk.ISBN == ISBN);
+                var both = await _bookRepository.GetBookByISBNAsync(ISBN) == await _bookRepository.GetBookByTitleAsync(Title);
+                book = await _bookRepository.GetBookByISBNAsync(ISBN);
             }
 
             return new JsonResult(book);

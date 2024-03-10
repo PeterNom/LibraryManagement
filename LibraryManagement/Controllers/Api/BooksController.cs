@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Data;
 using LibraryManagement.Models;
+using LibraryManagement.Repositories;
 
 namespace LibraryManagement.Controllers.Api
 {
@@ -14,32 +15,32 @@ namespace LibraryManagement.Controllers.Api
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly LibManagerDbContext _libManagerDbcontext;
+        private readonly BookRepository _bookRepository;
 
-        public BooksController(LibManagerDbContext context)
+        public BooksController(BookRepository bookRepository)
         {
-            _libManagerDbcontext = context;
+            _bookRepository = bookRepository;
         }
 
         // GET: api/Books
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
-            return await _libManagerDbcontext.Books.ToListAsync();
+            return Ok( await _bookRepository.GetBooksAsync() );
         }
 
         // GET: api/Books/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
-            var book = await _libManagerDbcontext.Books.FirstOrDefaultAsync(bk => bk.BookId == id);
+            var book = await _bookRepository.GetBookAsync(id);
 
             if (book == null)
             {
                 return NotFound();
             }
 
-            return book;
+            return Ok(book);
         }
 
         // PUT: api/Books/5
@@ -50,17 +51,16 @@ namespace LibraryManagement.Controllers.Api
             {
                 return BadRequest();
             }
-
-            _libManagerDbcontext.Entry(book).State = EntityState.Modified;
+            _bookRepository.ChangeEntityState(book);
 
             try
             {
 
-                await _libManagerDbcontext.SaveChangesAsync();
+                await _bookRepository.SaveBookAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                var result = _libManagerDbcontext.Books.Any(bk => bk.BookId == id);
+                var result = await _bookRepository.BookExistsAsync(id);
 
                 if (!result)
                 {
@@ -79,8 +79,7 @@ namespace LibraryManagement.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
-            _libManagerDbcontext.Books.Add(book);
-            await _libManagerDbcontext.SaveChangesAsync();
+            await _bookRepository.AddBookAsync(book);
 
             return CreatedAtAction("GetBook", new { id = book.BookId }, book);
         }
@@ -89,18 +88,15 @@ namespace LibraryManagement.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            var book = await _libManagerDbcontext.Books.FirstOrDefaultAsync(bk => bk.BookId == id);
+            var book = await _bookRepository.GetBookAsync(id);
+
             if (book == null)
             {
                 return NotFound();
             }
-
-            _libManagerDbcontext.Books.Remove(book);
-            await _libManagerDbcontext.SaveChangesAsync();
+            await _bookRepository.RemoveBookAsync(book);
 
             return NoContent();
         }
-        
-
     }
 }

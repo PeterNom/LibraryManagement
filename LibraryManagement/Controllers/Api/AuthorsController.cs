@@ -42,7 +42,7 @@ namespace LibraryManagement.Controllers.Api
                 return NotFound();
             }
 
-            return Ok(author);
+            return author;
         }
 
         // PUT: api/Authors/5

@@ -18,17 +18,17 @@ namespace LibraryManagement.Repositories
         public async Task<Author?> GetAuthorAsync(int id)
         {
             
-            return await _libManagerDbcontext.Authors.Include(b=>b.Books).FirstOrDefaultAsync(a => a.AuthorId == id);
+            return await _libManagerDbcontext.Authors.Include(b=>b.Books).AsNoTracking().FirstOrDefaultAsync(a => a.AuthorId == id);
         }
 
         public async Task<IEnumerable<Author>> GetAuthorsAsync()
         {
-            return await _libManagerDbcontext.Authors.Include(b=>b.Books).OrderBy(a => a.Name).ToListAsync();
+            return await _libManagerDbcontext.Authors.Include(b=>b.Books).OrderBy(a => a.Name).AsNoTracking().ToListAsync();
         }
 
         public async Task<bool> AuthorExistsAsync(int id)
         {
-            var result = await _libManagerDbcontext.Authors.AnyAsync(a => a.AuthorId == id);
+            var result = await _libManagerDbcontext.Authors.AsNoTracking().AnyAsync(a => a.AuthorId == id);
 
             return result;
         }

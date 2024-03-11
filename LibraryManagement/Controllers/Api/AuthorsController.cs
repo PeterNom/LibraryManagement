@@ -9,6 +9,7 @@ using LibraryManagement.Data;
 using LibraryManagement.Models;
 using LibraryManagement.Repositories;
 using LibraryManagement.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryManagement.Controllers.Api
 {
@@ -47,6 +48,7 @@ namespace LibraryManagement.Controllers.Api
 
         // PUT: api/Authors/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutAuthor(int id, Author author)
         {
             if (id != author.AuthorId)
@@ -78,6 +80,7 @@ namespace LibraryManagement.Controllers.Api
 
         // POST: api/Authors
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Author>> PostAuthor([FromBody] Author author)
         {
             await _authorRepository.AddAuthorAsync(author);
@@ -87,6 +90,7 @@ namespace LibraryManagement.Controllers.Api
 
         // DELETE: api/Authors/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
             var author = await _authorRepository.GetAuthorAsync(id);

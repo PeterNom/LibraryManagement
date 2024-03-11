@@ -2,6 +2,7 @@ using LibraryManagement.Data;
 using LibraryManagement.Interfaces;
 using LibraryManagement.Models;
 using LibraryManagement.Repositories;
+using LibraryManagement.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<LibManagerDbContext>
 
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

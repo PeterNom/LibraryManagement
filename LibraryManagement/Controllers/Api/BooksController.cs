@@ -9,6 +9,7 @@ using LibraryManagement.Data;
 using LibraryManagement.Models;
 using LibraryManagement.Repositories;
 using LibraryManagement.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryManagement.Controllers.Api
 {
@@ -47,6 +48,7 @@ namespace LibraryManagement.Controllers.Api
 
         // PUT: api/Books/5
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutBook(int id, Book book)
         {
             if (id != book.BookId)
@@ -79,6 +81,7 @@ namespace LibraryManagement.Controllers.Api
 
         // POST: api/Books
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
             if (book == null)
@@ -96,6 +99,7 @@ namespace LibraryManagement.Controllers.Api
 
         // DELETE: api/Books/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteBook(int id)
         {
             var book = await _bookRepository.GetBookAsync(id);

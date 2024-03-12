@@ -53,7 +53,7 @@ namespace LibraryManagement.Controllers.Api
                             new NewUserDto
                             {
                                 Username = user.UserName,
-                                Email = user.Email,
+                                EmailAddress = user.Email,
                                 Token = _tokenService.CreateToken(user)
                             });
                     }
@@ -81,7 +81,7 @@ namespace LibraryManagement.Controllers.Api
                 return BadRequest(ModelState);
             }
 
-            var user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username);
+            User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username);
 
             if(user == null)
             {
@@ -98,10 +98,17 @@ namespace LibraryManagement.Controllers.Api
             return Ok(new NewUserDto
             {
                 Username = user.UserName,
-                Email = user.Email,
+                EmailAddress = user.Email,
                 Token = _tokenService.CreateToken(user)
             });
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            return Ok("User signed out");
+        }
     }
 }

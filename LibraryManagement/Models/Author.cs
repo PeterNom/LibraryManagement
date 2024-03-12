@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.Security.Policy;
 
 namespace LibraryManagement.Models
 {
+    [Index(nameof(Name), IsUnique = true)]
     public class Author
     {
         public int AuthorId { get; set; }

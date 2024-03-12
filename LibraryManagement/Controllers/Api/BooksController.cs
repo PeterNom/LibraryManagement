@@ -87,10 +87,12 @@ namespace LibraryManagement.Controllers.Api
             if (book == null)
                 return BadRequest();
 
-            book.Author = await _authorRepository.GetAuthorAsync(book.AuthorId);
+            Author? author = await _authorRepository.GetAuthorAsync(book.AuthorId);
 
-            if (book.Author == null)
+            if (author == null)
                 return BadRequest();
+
+            book.Author = author;
 
             await _bookRepository.AddBookAsync(book);
 

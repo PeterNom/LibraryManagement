@@ -28,7 +28,7 @@ builder.Services.AddIdentityApiEndpoints<User>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<LibManagerDbContext>();
 
-builder.Services.AddAuthorization();
+
 builder.Services.AddAuthentication(options => 
     {
         options.DefaultAuthenticateScheme =
@@ -48,13 +48,13 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JWT:Audience"],
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(
-            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"]))
+            System.Text.Encoding.UTF8.GetBytes(builder.Configuration["JWT:SigningKey"])),
+        ValidateLifetime = true
     };
 });
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
-
-app.MapIdentityApi<User>();
 
 if (app.Environment.IsDevelopment())
 {

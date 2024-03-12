@@ -6,9 +6,10 @@ namespace LibraryManagement.Dtos.User
     public class LoginDto
     {
         [Required]
-        public string Username { get; set; }
+        [StringLength(100)]
+        public string Username { get; set; } = string.Empty;
 
         [Required]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
     }
 }

@@ -17,7 +17,7 @@ namespace LibraryManagement.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            // Adding the roles to the database.
             List<IdentityRole> roles = new List<IdentityRole>
             {
                 new IdentityRole

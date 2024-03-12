@@ -29,21 +29,26 @@ namespace LibraryManagement.Controllers.Api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetBooks()
         {
-            return Ok( await _bookRepository.GetBooksAsync() );
+            // Return all books.
+            var books = await _bookRepository.GetBooksAsync();
+
+            return Ok(books);
         }
 
         // GET: api/Books/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Book>> GetBook(int id)
         {
+            // Find the book to return.
             var book = await _bookRepository.GetBookAsync(id);
 
+            // Check if book found.
             if (book == null)
             {
                 return NotFound();
             }
 
-            return Ok(book);
+            return book;
         }
 
         // PUT: api/Books/5
@@ -51,21 +56,26 @@ namespace LibraryManagement.Controllers.Api
         [Authorize]
         public async Task<IActionResult> PutBook(int id, Book book)
         {
+            // Check if we update the correct object.
             if (id != book.BookId)
             {
                 return BadRequest();
             }
+
+            // Notify the entity state that the object state had changed.
             _bookRepository.ChangeEntityState(book);
 
             try
             {
-
+                // Update book to the database.
                 await _bookRepository.SaveBookAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
+                // Check if the book exists.
                 var result = await _bookRepository.BookExistsAsync(id);
 
+                // We tried to update book that doesn't exists.
                 if (!result)
                 {
                     return NotFound();
@@ -84,16 +94,21 @@ namespace LibraryManagement.Controllers.Api
         [Authorize]
         public async Task<ActionResult<Book>> PostBook(Book book)
         {
+            // Check if book to add is not null.
             if (book == null)
                 return BadRequest();
 
+            // Retrieve the author of the book.
             Author? author = await _authorRepository.GetAuthorAsync(book.AuthorId);
 
+            // Check that the author is not null.
             if (author == null)
                 return BadRequest();
 
+            // Update book author.
             book.Author = author;
 
+            // Add book to the database.
             await _bookRepository.AddBookAsync(book);
 
             return CreatedAtAction("GetBook", new { id = book.BookId }, book);
@@ -104,12 +119,16 @@ namespace LibraryManagement.Controllers.Api
         [Authorize]
         public async Task<IActionResult> DeleteBook(int id)
         {
+            // Find the book to delete.
             var book = await _bookRepository.GetBookAsync(id);
 
+            // Check if book exists.
             if (book == null)
             {
                 return NotFound();
             }
+
+            // Delete book from the database.
             await _bookRepository.RemoveBookAsync(book);
 
             return NoContent();

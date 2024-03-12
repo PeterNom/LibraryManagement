@@ -28,7 +28,9 @@ namespace LibraryManagement.Controllers.Api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Author>>> GetAuthors()
         {
+            // Return all authors.
             var authors = await _authorRepository.GetAuthorsAsync();
+
             return Ok(authors);
         }
 
@@ -36,8 +38,10 @@ namespace LibraryManagement.Controllers.Api
         [HttpGet("{id}")]
         public async Task<ActionResult<Author>> GetAuthor(int id)
         {
+            // Find the author to return.
             var author = await _authorRepository.GetAuthorAsync(id);
 
+            // Check if author found.
             if (author == null)
             {
                 return NotFound();
@@ -51,20 +55,26 @@ namespace LibraryManagement.Controllers.Api
         [Authorize]
         public async Task<IActionResult> PutAuthor(int id, Author author)
         {
+            // Check if we update the correct object.
             if (id != author.AuthorId)
             {
                 return BadRequest();
             }
+
+            // Notify the entity state that the object state had changed.
             _authorRepository.ChangeEntityState(author);
 
             try
             {
+                // Update author to the database.
                 await _authorRepository.SaveAuthorAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
+                // Check if the author exists.
                 var result = await _authorRepository.AuthorExistsAsync(id);
-
+                
+                // We tried to update author that doesn't exists.
                 if (!result)
                 {
                     return NotFound();
@@ -81,8 +91,13 @@ namespace LibraryManagement.Controllers.Api
         // POST: api/Authors
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult<Author>> PostAuthor([FromBody] Author author)
+        public async Task<ActionResult<Author>> PostAuthor(Author author)
         {
+            // Check if author to add is not null.
+            if (author == null)
+                return BadRequest();
+
+            // Add author to the database.
             await _authorRepository.AddAuthorAsync(author);
 
             return CreatedAtAction("GetAuthor", new { id = author.AuthorId }, author);
@@ -93,13 +108,16 @@ namespace LibraryManagement.Controllers.Api
         [Authorize]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
+            // Find the author to delete.
             var author = await _authorRepository.GetAuthorAsync(id);
 
+            // Check if author exists.
             if (author == null)
             {
                 return NotFound();
             }
 
+            // Delete author from the database.
             await _authorRepository.RemoveAuthorAsync(author);
 
             return NoContent();

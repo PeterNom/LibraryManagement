@@ -30,25 +30,30 @@ namespace LibraryManagement.Controllers.Api
         {
             try
             {
+                // Check if model state is valid.
                 if(!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
 
+                // Create a new user object
                 var user = new User
                 {
                     UserName = registerDto.Username,
                     Email = registerDto.EmailAddress
                 };
 
+                // Create a new User with its password.
                 var createUser = await _userManager.CreateAsync(user, registerDto.Password);
 
                 if(createUser.Succeeded)
                 {
+                    // Give the role to the newly created user.
                     var role = await _userManager.AddToRoleAsync(user, "User");
 
                     if(role.Succeeded)
                     {
+                        // Return the new user and its JWT token.
                         return Ok(
                             new NewUserDto
                             {
@@ -76,11 +81,13 @@ namespace LibraryManagement.Controllers.Api
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            if(!ModelState.IsValid)
+            // Check if model state is valid.
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            // Find the User that requests a login by its username.
             User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username);
 
             if(user == null)
@@ -88,6 +95,7 @@ namespace LibraryManagement.Controllers.Api
                 return Unauthorized("Unknown user.");
             }
 
+            //Check the password of the user trying to login.
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
 
             if (!result.Succeeded)
@@ -95,6 +103,7 @@ namespace LibraryManagement.Controllers.Api
                 return Unauthorized("Username and password don't match.");
             }
 
+            // Return the logged user and its JWT token.
             return Ok(new NewUserDto
             {
                 Username = user.UserName,
@@ -106,6 +115,7 @@ namespace LibraryManagement.Controllers.Api
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
+            // Log out the current logged in user.
             await _signInManager.SignOutAsync();
 
             return Ok("User signed out");

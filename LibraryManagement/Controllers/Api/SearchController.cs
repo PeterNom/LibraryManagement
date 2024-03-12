@@ -20,19 +20,25 @@ namespace LibraryManagement.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> SearchBook([FromBody] string ISBN, string? Title)
         {
+            // Book to return from the search.
             Book? book = new Book();
 
+            // If only ISBN given 
             if (!string.IsNullOrEmpty(ISBN) && string.IsNullOrEmpty(Title))
             {
+                // Find the book based on its ISBN
                 book = await _bookRepository.GetBookByISBNAsync(ISBN);
             }
-            if(string.IsNullOrEmpty(ISBN) && !string.IsNullOrEmpty(Title))
+            // If only Title given 
+            else if (string.IsNullOrEmpty(ISBN) && !string.IsNullOrEmpty(Title))
             {
+                // Find the book based on its Title
                 book = await _bookRepository.GetBookByTitleAsync(Title);
             }
-
-            if (!string.IsNullOrEmpty(ISBN) && !string.IsNullOrEmpty(Title))
+            // If ISBN and Title given
+            else if (!string.IsNullOrEmpty(ISBN) && !string.IsNullOrEmpty(Title))
             {
+                // Find both books and check if they match 
                 var both = await _bookRepository.GetBookByISBNAsync(ISBN) == await _bookRepository.GetBookByTitleAsync(Title);
                 book = await _bookRepository.GetBookByISBNAsync(ISBN);
             }

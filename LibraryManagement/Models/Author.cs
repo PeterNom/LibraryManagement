@@ -4,6 +4,7 @@ using System.Security.Policy;
 
 namespace LibraryManagement.Models
 {
+    // Making the name of the Author unique
     [Index(nameof(Name), IsUnique = true)]
     public class Author
     {

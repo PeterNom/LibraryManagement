@@ -4,6 +4,7 @@ using System.Xml.Linq;
 
 namespace LibraryManagement.Models
 {
+    // Making the Title and ISBN of the Book unique
     [Index(nameof(ISBN), IsUnique = true)]
     [Index(nameof(Title), IsUnique = true)]
     public class Book

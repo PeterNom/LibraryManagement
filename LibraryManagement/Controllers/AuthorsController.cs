@@ -11,7 +11,7 @@ using LibraryManagement.Repositories;
 using LibraryManagement.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
-namespace LibraryManagement.Controllers.Api
+namespace LibraryManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -73,7 +73,7 @@ namespace LibraryManagement.Controllers.Api
             {
                 // Check if the author exists.
                 var result = await _authorRepository.AuthorExistsAsync(id);
-                
+
                 // We tried to update author that doesn't exists.
                 if (!result)
                 {

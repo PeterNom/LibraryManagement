@@ -11,7 +11,7 @@ using LibraryManagement.Repositories;
 using LibraryManagement.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
-namespace LibraryManagement.Controllers.Api
+namespace LibraryManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

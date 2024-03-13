@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace LibraryManagement.Controllers.Api
+namespace LibraryManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class SearchController : ControllerBase
     {
         private readonly BookRepository _bookRepository;
-        public SearchController(BookRepository bookRepository) 
+        public SearchController(BookRepository bookRepository)
         {
             _bookRepository = bookRepository;
         }

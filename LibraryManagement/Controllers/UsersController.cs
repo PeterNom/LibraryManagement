@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
-namespace LibraryManagement.Controllers.Api
+namespace LibraryManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -31,7 +31,7 @@ namespace LibraryManagement.Controllers.Api
             try
             {
                 // Check if model state is valid.
-                if(!ModelState.IsValid)
+                if (!ModelState.IsValid)
                 {
                     return BadRequest(ModelState);
                 }
@@ -46,12 +46,12 @@ namespace LibraryManagement.Controllers.Api
                 // Create a new User with its password.
                 var createUser = await _userManager.CreateAsync(user, registerDto.Password);
 
-                if(createUser.Succeeded)
+                if (createUser.Succeeded)
                 {
                     // Give the role to the newly created user.
                     var role = await _userManager.AddToRoleAsync(user, "User");
 
-                    if(role.Succeeded)
+                    if (role.Succeeded)
                     {
                         // Return the new user and its JWT token.
                         return Ok(
@@ -90,7 +90,7 @@ namespace LibraryManagement.Controllers.Api
             // Find the User that requests a login by its username.
             User? user = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username);
 
-            if(user == null)
+            if (user == null)
             {
                 return Unauthorized("Unknown user.");
             }
